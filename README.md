@@ -4,7 +4,7 @@
 
     docker-compose up --build
 
-### Scrap pages and write results into darabase endpoint (returns the most epensive car from page )
+### Scrap pages and write results into database endpoint (returns the most epensive car from page )
 
 `http://localhost:8000/autos/scrap/page/<int:pk>`
 
