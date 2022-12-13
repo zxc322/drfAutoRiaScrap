@@ -18,12 +18,14 @@ class ScrapPage(APIView):
 
 
 
-class GetAllCars(View):
+class GetAllCars(APIView):
 
     def get(self, request):
         queryset = AutoFilter(params=request.META.get('QUERY_STRING')).apply_filters()
         serializer = CarSerializer(queryset, many=True)
-        return JsonResponse(serializer.data, safe=False)
+        return Response(serializer.data)
+
+
         
             
 
