@@ -2,3 +2,5 @@ django
 djangorestframework
 httpx
 parsel
+psycopg2-binary
+python-dotenv

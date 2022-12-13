@@ -1,0 +1,9 @@
+POSTGRES_PORT=5432
+WEB_PORT = 8000
+
+POSTGRES_DB="drf_autos"
+POSTGRES_USER="zxc"
+POSTGRES_PASSWORD="zxc"
+
+DB_HOST="postgres"
+LOCAL_DB_HOST="localhost"

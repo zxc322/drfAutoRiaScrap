@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  web:
+    container_name: web
+    build: .
+    command: python config/manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    env_file:
+      - ./.env
+    ports:
+       - ${WEB_PORT}:${WEB_PORT}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: always
+  
+  postgres:
+    container_name: postgres_container
+    image: postgres:13.8
+    env_file:
+      - ./.env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - "postgres:/var/lib/postgresql/data"
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+
+volumes:
+  postgres:

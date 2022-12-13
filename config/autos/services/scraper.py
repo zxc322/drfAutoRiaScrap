@@ -1,13 +1,13 @@
-from typing import Optional, List, Dict
-from datetime import datetime
+from typing import Optional, List
 import httpx
 from parsel import Selector
+
+from autos.serializers import NewCarSerializer
 
 
 class Scraper:
 
-    def __init__(self, url: str) -> None:
-        self.url = url
+    def __init__(self) -> None:
         self.title_xpath='div/div/a/span/text()'
         self.year_xpath='div/div/a/text()'
         self.price_xpath='div[@class="price-ticket"]'
@@ -16,17 +16,17 @@ class Scraper:
                             /div[@class="base_information"]\
                             /span[contains(@class, "state-num")]'
     
-    def get_html(self) -> Optional[str]:
+    def get_html(self, url: str) -> Optional[str]:
         """ Returns html page as str """
 
-        response = httpx.get(url=self.url)
+        response = httpx.get(url=url)
         return response.text if response.status_code == 200 else None
 
 
-    def scrap_all_cars_on_page(self) -> List:
+    def scrap_all_cars_on_page(self, url: str) -> List:
         """ Searching all {div.content} and calling {scrap_single_car} """
 
-        text = self.get_html()
+        text = self.get_html(url=url)
         if text:
             selector = Selector(text=text)
             cars = selector.xpath('//div[@class="content"]') 
@@ -66,5 +66,26 @@ class Scraper:
         state_number_block = car.xpath(self.state_number_xpath)
         if state_number_block:
             return state_number_block.xpath('text()').get().strip()
+
+        
+    def insert_into_database(self, url: str) -> NewCarSerializer:
+        """ Inserts all cars into database. Returns the most expensive car """
+
+        cars_list = self.scrap_all_cars_on_page(url=url)
+        top_car = NewCarSerializer(data=cars_list[0])
+        if top_car.is_valid():
+            top_car.save()
+        for car in cars_list[1:]:
+            new_car = NewCarSerializer(data=car)
+            if new_car.is_valid():
+                new_car.save()
+                top_car = self.compare_prices(car_1=top_car, car_2=new_car)
+        return top_car
+
+    
+    def compare_prices(self, car_1: NewCarSerializer, car_2: NewCarSerializer) -> NewCarSerializer:
+        """ Returns car with highest price (returns 1st car if prices are equals """
+
+        return car_2 if car_2.validated_data['price'] > car_1.validated_data['price'] else car_1
 
         
