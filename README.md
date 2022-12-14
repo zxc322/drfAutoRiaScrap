@@ -15,9 +15,17 @@
 ### Filters example
 
 `?price=[int,int]`
+
 `?year=[int,int]`
+
 `?mileage=[int,int]`
-`?state_number=true` or `?state_number=false`
+
+`?state_number=bool` [true, false]
+
+`?page=int` default=1
+
+`?limit=int` default=10
+
 `order_by='-price` allowed values = ('price', '-price', 'year', '-year', 'mileage', '-mileage')
 
 ### request example

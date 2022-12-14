@@ -10,7 +10,7 @@ from autos.models import Car
 class AutoFilter:
 
     def __init__(self, params: str = None) -> None:
-        self.allowed_params = ('price', 'year', 'state_number', 'mileage', 'order_by')
+        self.allowed_params = ('price', 'year', 'state_number', 'mileage', 'order_by', 'page', 'limit')
         self.order_by_allowed_values = ('price', '-price', 'year', '-year', 'mileage', '-mileage')
         self.params = params
         self.filters = dict()
@@ -68,6 +68,18 @@ class AutoFilter:
                  Allowed fields: "{self.order_by_allowed_values}"')
         self.queryset = self.queryset.order_by(ordering_field)
 
+    
+    def paginated_queryset(self) -> None:
+        page = self.filters.get('page')
+        limit = self.filters.get('limit')
+        if not limit or not isinstance(limit, int):
+            limit = 10
+        if not page or not isinstance(page, int) or page < 1:
+            page = 1
+        start = (page-1) * limit
+        return self.queryset[start:start+limit]
+
+
 
     def apply_filters(self) -> QuerySet:
         if self.filters.get('state_number'):
@@ -84,8 +96,8 @@ class AutoFilter:
 
         if self.filters.get('order_by'):
             self.order_by_()
-
-        return self.queryset
+        
+        return self.paginated_queryset()
         
     
     
