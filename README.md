@@ -26,7 +26,7 @@
 
 `?limit=int` default=10
 
-`order_by='-price` allowed values = ('price', '-price', 'year', '-year', 'mileage', '-mileage')
+`order_by=-price` allowed values = ('price', '-price', 'year', '-year', 'mileage', '-mileage')
 
 ### request example
 
